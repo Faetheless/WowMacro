@@ -1,4 +1,50 @@
-# Make Verbose Work
+<#
+.SYNOPSIS
+A PowerShell script to generate World of Warcraft macros.
+
+.DESCRIPTION
+The `macrowow.ps1` script creates customizable macros for World of Warcraft. It accepts a variety of parameters to specify the spell, target, and other options for the macro.
+
+.PARAMETER spellName
+The name of the spell to use in the macro.
+
+.PARAMETER Targeted
+A boolean value indicating whether the spell should be targeted.
+
+.PARAMETER trinketSlot
+The slot number of the trinket to use.
+
+.PARAMETER Consumable
+The name of the consumable to use.
+
+.PARAMETER targetType
+The type of target for the spell.
+
+.PARAMETER AtCursor
+A boolean value indicating whether the spell should be cast at the cursor.
+
+.PARAMETER deathStatus
+The death status of the target.
+
+.PARAMETER petCommand
+The command to give to the pet.
+
+.PARAMETER battleRez
+A boolean value indicating whether to use a battle resurrection.
+
+.PARAMETER ChatMessage
+The chat message to send.
+
+.PARAMETER ChatCommand
+The chat command to use.
+
+.EXAMPLE
+.\macrowow.ps1 -spellName "Heal" -Targeted $true -ChatMessage "Healing"
+This example creates a macro with a spell named "Heal", a targeted spell, and a chat message.
+
+.NOTES
+Ensure that the spell names and other parameters are valid in the current version of World of Warcraft.
+#>
 [CmdletBinding()]
 param (
     [Parameter(Mandatory=$true)]
