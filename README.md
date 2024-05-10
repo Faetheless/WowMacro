@@ -23,12 +23,12 @@ The script accepts several parameters to customize the macro:
 To create a macro with a spell named "Heal", a targeted spell, and a chat message, you would enter:
 
 ```powershell
-.\macrowow.ps1 -SpellName "Heal" -Targeted $true -ChatMessage "Healing incoming!"
+.\wowmacro.ps1 -SpellName "Heal" -Targeted $true -ChatMessage "Healing incoming!"
 ```
 
  For another example of an acceptable command:
  ```powershell
-.\macrowow.ps1 -SpellName "Incarnation: Guardian of Ursoc" -BigCD $true -Consumable "Elemental Potion of Ultimate Power" -ChatCommand "yell" -ChatMessage "BEAR DOWN FOR MIDTERMS"
+.\wowmacro.ps1 -SpellName "Incarnation: Guardian of Ursoc" -BigCD $true -Consumable "Elemental Potion of Ultimate Power" -ChatCommand "yell" -ChatMessage "BEAR DOWN FOR MIDTERMS"
 ```
 If you encounter an error about a parameter being specified more than once, ensure no duplicate parameters exist in your command.
 
@@ -37,6 +37,6 @@ If you encounter an error about a parameter being specified more than once, ensu
 If you're having trouble, you can use the -Verbose parameter. Remember that it should be used when calling the script, not within the script itself.
 
 ```powershell
-.\macrowow.ps1 -Verbose
+.\wowmacro.ps1 -Verbose
 ```
 
