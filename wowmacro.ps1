@@ -3,47 +3,90 @@
 A PowerShell script to generate World of Warcraft macros.
 
 .DESCRIPTION
-The `macrowow.ps1` script creates customizable macros for World of Warcraft. It accepts a variety of parameters to specify the spell, target, and other options for the macro.
+The `macrowow.ps1` script creates customizable macros for World of Warcraft. It accepts a variety of parameters to specify the spell, target, and other options for the macro. Users can generate simple macros with just a spell cast or more complex macros that include targeting conditions, consumable usage, trinket activation, and pet commands. The script ensures that all macros are properly formatted and saved to the default directory `C:\WoW-Macros\` for easy access.
 
 .PARAMETER spellName
-The name of the spell to use in the macro.
+The name of the spell to use in the macro. -example "Death Strike"
 
 .PARAMETER Targeted
-A boolean value indicating whether the spell should be targeted.
+A boolean value indicating whether the spell should be targeted. /example: $true or $false
 
 .PARAMETER trinketSlot
-The slot number of the trinket to use.
+The slot number of the trinket to use. -example 13 or 14
 
-.PARAMETER Consumable
-The name of the consumable to use.
+.PARAMETER Consumabled
+The name of the consumable to use. -example "Healthstone"
 
 .PARAMETER targetType
-The type of target for the spell.
+The type of target for the spell. -example "harm" or "help"
 
 .PARAMETER AtCursor
-A boolean value indicating whether the spell should be cast at the cursor.
+A boolean value indicating whether the spell should be cast at the cursor. /example: $true or $false
 
 .PARAMETER deathStatus
-The death status of the target.
+The death status of the target. /example: dead, nodead
 
 .PARAMETER petCommand
-The command to give to the pet.
+The command to give to the pet. /example: attack, follow, stay
 
 .PARAMETER battleRez
-A boolean value indicating whether to use a battle resurrection.
+A boolean value indicating whether to use a battle resurrection. example: $true or $false 
 
 .PARAMETER ChatMessage
-The chat message to send.
+The chat message to send. example: "Hello World!"
 
 .PARAMETER ChatCommand
-The chat command to use.
+The chat command to use. example: /say, /yell
+
+.PARAMETER Simple
+Modifies the macro to be a simple cast line. example: /cast spellName
+
+.PARAMETER DirectoryPath
+The directory path where the macro file will be saved. If not specified, the default directory is "C:\WoW-Macros\". -example: "D:\CustomMacros\"
 
 .EXAMPLE
-.\macrowow.ps1 -spellName "Heal" -Targeted $true -ChatMessage "Healing"
-This example creates a macro with a spell named "Heal", a targeted spell, and a chat message.
+.\macrowow.ps1 -spellName "Death Strike" -Targeted $true -ChatMessage "Healing"
+This example creates a macro for the spell "Death Strike" that targets a specific unit and includes a chat message "Healing".
+Macro Output:
+#showtooltip Death Strike
+/stopcasting
+/cast [@mouseover,exists,help,nodead] Death Strike; [@focus,help,nodead] Death Strike; Death Strike
+/say Healing
+
+.EXAMPLE
+.\macrowow.ps1 -spellName "Fireball" -Simple $true
+This example creates a simple macro for the spell "Fireball" that only includes the cast command without any additional targeting or conditions.
+Macro Output:
+#showtooltip Fireball
+/cast Fireball
+
+.EXAMPLE
+.\macrowow.ps1 -spellName "Arcane Intellect" -Consumable "Mana Potion" -trinketSlot 13
+This example creates a macro for the spell "Arcane Intellect" that also uses a "Mana Potion" and activates the trinket in slot 13.
+Macro Output:
+#showtooltip Arcane Intellect
+/stopcasting
+/use Mana Potion
+/use 13
+/cast [@mouseover,exists,help,nodead] Arcane Intellect; [@focus,help,nodead] Arcane Intellect; Arcane Intellect
+
+.EXAMPLE
+.\macrowow.ps1 -spellName "Revive Pet" -PetCommand "attack" -BattleRez $true
+This example creates a macro for the spell "Revive Pet" that commands the pet to attack and includes battle resurrection conditions.
+Macro Output:
+#showtooltip Revive Pet
+/stopcasting
+/cast [nopet] Call Pet 1
+/cast [nopet,@pet2] Call Pet 2
+/petattack [@target,exists]
+/cast [@mouseover,exists,help,dead] Revive Pet; [@focus,help,dead] Revive Pet; Revive Pet
 
 .NOTES
-Ensure that the spell names and other parameters are valid in the current version of World of Warcraft.
+Ensure that the spell names and other parameters are valid in the current version of World of Warcraft. 
+Author: Faetheless
+Date: 2024-10-12
+Version: 1.2
+This script is intended for use with World of Warcraft and may need updates for compatibility with future game patches.
 #>
 [CmdletBinding()]
 param (
@@ -89,11 +132,13 @@ param (
     [bool]$AtPlayer = $false,
 
     [Parameter(Mandatory=$false)]
-    [bool]$BigCD = $false,
+    [bool]$Simple = $false,
 
     [Parameter(Mandatory=$false)]
-    [bool]$stopcast = $false
+    [bool]$stopcast = $false,
 
+    [Parameter(Mandatory=$false)]
+    [string]$DirectoryPath = "C:\WoW-Macros\"  # Default directory path
 )
 
 # Function to create the macro based on user inputs
@@ -110,8 +155,8 @@ function New-Macro {
         [string]$ChatMessage,
         [string]$ChatCommand,
         [bool]$AtPlayer,
-        [bool]$BigCD,
-        [bool]$stopcast
+        [bool]$stopcast,
+        [bool]$Simple
     )
 
     Write-Verbose "Starting $spellName Macro with a Tooltip"
@@ -146,9 +191,10 @@ function New-Macro {
         Write-Verbose "BattleRez is true, modifying the target type and death status"
         $TargetType = "help"
         $DeathStatus = "dead"
+        $Targeted = $false
     }
     
-    if ($BigCD -eq $false) {
+    if ($Simple -eq $false) {
         if ($AtCursor -eq $false) {
             Write-Verbose "Main Cast Line"
             if ($AtPlayer -eq $false) {
@@ -164,14 +210,9 @@ function New-Macro {
             $Targeted = $false
         }
     } else {
-        Write-Verbose "Big CD Line"
+        Write-Verbose "Simple Cast Line"
         $macroText += "`n/cast $spellName"
         $Targeted = $false
-    }
-
-    if ($Targeted) {
-        Write-Verbose "Appending the targeting line"
-        $macroText += "`n/target [@mouseover,$TargetType,nodead]"
     }
 
     if ($PetCommand -eq "attack") {
@@ -184,6 +225,11 @@ function New-Macro {
     if ($ChatMessage) {
         Write-Verbose "chat message is specified, appending it to the macro"
         $macroText += "`n/$ChatCommand $ChatMessage"
+    }
+    
+    if ($Targeted) {
+        Write-Verbose "Appending the targeting line"
+        $macroText += "`n/target [@mouseover,$TargetType,nodead]"
     }
 
     return $macroText
@@ -211,14 +257,14 @@ function Get-SpellName {
 function Save-MacroToFile {
     param (
         [string]$macroText,
-        [string]$spellName
+        [string]$spellName,
+        [string]$DirectoryPath
     )
 
     # Sanitize the file Name
     $SanSpell = Convert-FilePath -UnsanitizedSpell $spellName
 
     # Specify the file path
-    $directoryPath = "C:\WoW-Macros\"
     $filePath = "$directoryPath$SanSpell-Macro.txt"
 
 
@@ -240,6 +286,6 @@ if (-not $spellName) {
     $spellName = Get-SpellName
 }
 
-$macroText = New-Macro -spellName $spellName -Targeted $Targeted -trinketSlot $TrinketSlot -Consumable $Consumable -targetType $TargetType -AtCursor $AtCursor -deathStatus $DeathStatus -petCommand $PetCommand -battleRez $BattleRez -ChatMessage $ChatMessage -ChatCommand $ChatCommand -AtPlayer $AtPlayer -BigCD $BigCD -stopcast $stopcast
-Save-MacroToFile -macroText $macroText -spellName $spellName
+$macroText = New-Macro -spellName $spellName -Targeted $Targeted -trinketSlot $TrinketSlot -Consumable $Consumable -targetType $TargetType -AtCursor $AtCursor -deathStatus $DeathStatus -petCommand $PetCommand -battleRez $BattleRez -ChatMessage $ChatMessage -ChatCommand $ChatCommand -AtPlayer $AtPlayer -Simple $Simple -stopcast $stopcast
+Save-MacroToFile -macroText $macroText -spellName $spellName -DirectoryPath $DirectoryPath
 Write-Host $macroText
