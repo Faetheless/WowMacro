@@ -17,6 +17,11 @@ The script accepts several parameters to customize the macro:
 - **`-battleRez`**: Whether to use a battle resurrection.
 - **`-ChatMessage`**: The chat message to send.
 - **`-ChatCommand`**: The chat command to use.
+- **`-AtPlayer`**: Whether the spell should be cast at the player.
+- **`-BigCD`**: Whether the spell is a big cooldown.
+- **`-stopcast`**: Whether to include a stopcasting line.
+- **`-Simple`**: Modifies the macro to be a simple cast line.
+- **`-DirectoryPath`**: The directory path where the macro file will be saved. If not specified, the default directory is `C:\WoW-Macros\`.
 
 ## Example Usage
 
@@ -26,8 +31,8 @@ To create a macro with a spell named "Heal", a targeted spell, and a chat messag
 .\wowmacro.ps1 -SpellName "Heal" -Targeted $true -ChatMessage "Healing incoming!"
 ```
 
- For another example of an acceptable command:
- ```powershell
+For another example of an acceptable command:
+```powershell
 .\wowmacro.ps1 -SpellName "Incarnation: Guardian of Ursoc" -BigCD $true -Consumable "Elemental Potion of Ultimate Power" -ChatCommand "yell" -ChatMessage "BEAR DOWN FOR MIDTERMS"
 ```
 If you encounter an error about a parameter being specified more than once, ensure no duplicate parameters exist in your command.
@@ -39,4 +44,3 @@ If you're having trouble, you can use the -Verbose parameter. Remember that it s
 ```powershell
 .\wowmacro.ps1 -Verbose
 ```
-
