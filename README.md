@@ -44,3 +44,8 @@ If you're having trouble, you can use the -Verbose parameter. Remember that it s
 ```powershell
 .\wowmacro.ps1 -Verbose
 ```
+
+You can also use the Get-Help Command to display the help page
+```powershell
+Get-Help wowmacro.ps1
+```
